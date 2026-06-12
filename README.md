@@ -1,83 +1,208 @@
-# Cash Flow Minimizer — Multi-Mode DAA Project
+# 💰 Cash Flow Minimizer
 
-## 🚀 Setup & Run
+A graph-based financial optimization system that minimizes the number of transactions required to settle debts among multiple participants efficiently.
 
-### 1. Install dependencies
-```bash
-pip install flask
-```
+The project applies advanced graph algorithms and debt simplification techniques to transform complex financial obligations into an optimized settlement plan, reducing transaction overhead and improving payment efficiency.
 
-### 2. Run the app
-```bash
-cd cash-flow-minimizer
-python app.py
-```
+---
 
-### 3. Open in browser
-```
-http://127.0.0.1:5000
+## 🚀 Problem Statement
+
+In group expenses, business transactions, event management, and shared payments, multiple people often owe money to one another, creating a complex network of debts.
+
+Without optimization, settling these debts can require a large number of transactions, making the process inefficient and difficult to manage.
+
+This project solves the problem by applying graph-based optimization algorithms to minimize cash flow while ensuring all debts are settled correctly.
+
+---
+
+## ✨ Key Features
+
+### 📊 Cash Flow Optimization
+
+* Minimizes the total number of transactions required.
+* Simplifies complex debt relationships.
+* Generates an optimized settlement plan.
+
+### 🔗 Graph-Based Modeling
+
+* Represents users and transactions as graph structures.
+* Uses graph theory concepts to analyze financial relationships.
+* Efficiently processes multi-party settlements.
+
+### ⚡ Multi-Mode Settlement Strategies
+
+* Standard debt minimization mode.
+* Priority-based transaction handling.
+* Zero-sum settlement optimization.
+* Path-based transaction analysis.
+
+### 📈 Interactive Visualization
+
+* User-friendly dashboard.
+* Clear transaction summaries.
+* Visual representation of optimized cash flow.
+
+### 🎯 Efficient Debt Resolution
+
+* Reduces transaction complexity.
+* Eliminates unnecessary money transfers.
+* Improves settlement transparency.
+
+---
+
+## 🧠 Algorithms & Concepts Used
+
+This project demonstrates practical applications of:
+
+* Graph Theory
+* Greedy Algorithms
+* Debt Simplification Techniques
+* Net Balance Computation
+* Transaction Minimization
+* Optimization Strategies
+* Data Structures & Algorithms (DSA)
+
+---
+
+## 🏗️ System Workflow
+
+```text
+Input Transactions
+        │
+        ▼
+Debt Graph Construction
+        │
+        ▼
+Net Balance Calculation
+        │
+        ▼
+Cash Flow Optimization
+        │
+        ▼
+Transaction Minimization
+        │
+        ▼
+Optimized Settlement Output
 ```
 
 ---
 
-## 🌐 Pages
+## 🛠️ Tech Stack
 
-| URL | Mode | Algorithm |
-|-----|------|-----------|
-| `/` | Landing Page | Animation |
-| `/dashboard` | Greedy Mode | Greedy + Merge Sort |
-| `/priority` | Priority Mode | Sorting + Greedy |
-| `/paths` | Path Explorer | Graph + DFS/Backtracking |
-| `/zero-sum` | Zero-Sum Groups | DP-style Subset Search |
+### Frontend
 
----
+* HTML5
+* CSS3
+* JavaScript
 
-## 📡 API Endpoints
+### Backend
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/minimize` | POST | Greedy cash flow minimization |
-| `/api/priority` | POST | Priority-sorted settlement |
-| `/api/paths` | POST | DFS settlement path exploration |
-| `/api/zero-sum` | POST | Zero-sum group detection |
+* Python
+* Flask
 
-### Request format (all endpoints):
-```json
-{
-  "participants": ["Alice", "Bob", "Carol"],
-  "transactions": [
-    {"debtor": "Alice", "creditor": "Bob", "amount": 100},
-    {"debtor": "Bob", "creditor": "Carol", "amount": 50}
-  ]
-}
-```
+### Core Concepts
+
+* Graph Algorithms
+* Greedy Optimization
+* Cash Flow Minimization
 
 ---
 
-## 🗂 Project Structure
+## 📂 Project Structure
 
-```
+```text
 cash-flow-minimizer/
-├── app.py                  ← Flask backend (all 4 modes)
-├── templates/
-│   ├── index.html          ← Landing page with animation
-│   ├── dashboard.html      ← Mode 1: Greedy
-│   ├── priority.html       ← Mode 2: Priority
-│   ├── paths.html          ← Mode 3: Path Explorer
-│   └── zero_sum.html       ← Mode 4: Zero-Sum Groups
+│
+├── app.py
+│
 ├── static/
 │   └── css/
-│       └── base.css
+│
+├── templates/
+│   ├── dashboard.html
+│   ├── paths.html
+│   ├── priority.html
+│   ├── zero_sum.html
+│   └── index.html
+│
 └── README.md
 ```
 
 ---
 
-## 🧠 Algorithm Summary
 
-| Mode | Focus | Core Algorithm |
-|------|-------|----------------|
-| Greedy | Minimize transaction count | Greedy + Merge Sort |
-| Priority | Who should pay/receive first | Sorting by magnitude |
-| Path Explorer | All possible settlement chains | DFS + Backtracking |
-| Zero-Sum | Self-settling subgroups | Subset enumeration (DP-style) |
+## 📸 Screenshots
+
+### Dashboard
+
+<img width="959" height="539" alt="Screenshot 2026-06-12 193437" src="https://github.com/user-attachments/assets/b56285ae-82e0-4f61-abb1-3535b7597d2e" />
+
+<img width="959" height="539" alt="Screenshot 2026-06-12 193514" src="https://github.com/user-attachments/assets/008a5734-5af3-4da3-baa1-cd8592a91603" />
+
+### Cash Flow Optimization View
+
+<img width="944" height="539" alt="Screenshot 2026-06-12 193602" src="https://github.com/user-attachments/assets/f0ce1595-0940-46ea-97fd-24422c35f9e4" />
+
+### Path Analysis Module
+
+<img width="944" height="539" alt="Screenshot 2026-06-12 193621" src="https://github.com/user-attachments/assets/61bf5b4a-52b4-4903-aaa4-84547b885049" />
+
+### Priority Settlement Mode
+
+<img width="938" height="539" alt="Screenshot 2026-06-12 193642" src="https://github.com/user-attachments/assets/238a4ca7-2f0b-4ca1-a2ae-4fac8f607bd2" />
+
+### Zero-Sum Settlement Module
+
+<img width="947" height="539" alt="Screenshot 2026-06-12 193703" src="https://github.com/user-attachments/assets/b29fcdb6-0be1-4d82-b73c-e95da979b98a" />
+
+---
+
+## 🎯 Real-World Applications
+
+* Expense Splitting Platforms (Splitwise-like systems)
+* Corporate Expense Management
+* Event Budget Settlements
+* Group Travel Expense Tracking
+* Peer-to-Peer Payment Optimization
+* Financial Network Analysis
+
+---
+
+## 📊 Learning Outcomes
+
+Through this project, I explored:
+
+* Practical implementation of Graph Algorithms
+* Optimization-based problem solving
+* Financial network modeling
+* Flask web application development
+* Interactive dashboard design
+* Real-world applications of DSA concepts
+
+---
+
+## 🔮 Future Enhancements
+
+* Database integration for persistent storage
+* User authentication system
+* Real-time collaborative settlements
+* Advanced graph visualizations
+* Mobile-responsive interface
+* AI-powered financial recommendations
+
+---
+
+## 👩‍💻 Author
+
+**Smera Nimje**
+
+Computer Engineering Student | Full Stack Developer | Problem Solver
+
+GitHub: https://github.com/smera25
+
+---
+
+## ⭐ Support
+
+If you found this project useful, consider giving it a star!
