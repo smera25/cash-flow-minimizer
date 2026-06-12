@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Priority Mode — CashFlow Minimizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--border:#2a2a40;--accent:#7c6af7;--accent2:#f7c26a;--accent3:#6af7c2;--text:#e8e8f5;--muted:#7878a0;--danger:#f76a6a;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;display:flex;flex-direction:column;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,106,247,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,106,247,.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+  nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 2rem;background:rgba(10,10,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .logo span{-webkit-text-fill-color:var(--accent2);}
+  .nav-modes{display:flex;gap:.3rem;}
+  .nav-mode{padding:.45rem 1rem;border-radius:6px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;text-decoration:none;color:var(--muted);transition:background .2s,color .2s;border:1px solid transparent;}
+  .nav-mode:hover{color:var(--text);background:rgba(255,255,255,.05);}
+  .nav-mode.active{color:var(--accent);background:rgba(124,106,247,.1);border-color:rgba(124,106,247,.25);}
+  .nav-home{color:var(--muted);text-decoration:none;font-size:.78rem;}
+  .nav-home:hover{color:var(--text);}
+  .page-header{position:relative;z-index:1;padding:2rem 2rem 1rem;border-bottom:1px solid var(--border);}
+  .page-header .badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(124,106,247,.1);border:1px solid rgba(124,106,247,.25);color:var(--accent);padding:.3rem .8rem;border-radius:999px;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:.6rem;}
+  .page-header h1{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-1px;}
+  .page-header p{color:var(--muted);font-size:.83rem;margin-top:.3rem;}
+  .app-layout{position:relative;z-index:1;display:grid;grid-template-columns:360px 1fr;gap:1.5rem;padding:1.5rem 2rem;flex:1;max-width:1400px;margin:0 auto;width:100%;}
+  @media(max-width:900px){.app-layout{grid-template-columns:1fr;}}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .panel-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);}
+  .panel-title{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.5rem;}
+  .dot{width:8px;height:8px;border-radius:50%;}.dot-blue{background:var(--accent);}.dot-yellow{background:var(--accent2);}
+  .panel-body{padding:1.4rem;}
+  .input-group{margin-bottom:1.1rem;}
+  .input-group label{display:block;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem;}
+  .inp{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.65rem .9rem;border-radius:8px;font-family:'Space Mono',monospace;font-size:.84rem;transition:border-color .2s;}
+  .inp:focus{outline:none;border-color:var(--accent);}
+  .inp::placeholder{color:var(--muted);}
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem;min-height:32px;}
+  .chip{display:inline-flex;align-items:center;gap:.35rem;background:rgba(124,106,247,.15);border:1px solid rgba(124,106,247,.3);color:var(--accent);padding:.3rem .65rem;border-radius:999px;font-size:.75rem;}
+  .chip-remove{cursor:pointer;opacity:.6;transition:opacity .2s;background:none;border:none;color:inherit;padding:0;font-size:.85rem;}
+  .chip-remove:hover{opacity:1;}
+  .add-row{display:flex;gap:.5rem;}
+  .btn-add{background:rgba(124,106,247,.2);border:1px solid rgba(124,106,247,.4);color:var(--accent);padding:.65rem .9rem;border-radius:8px;font-family:'Space Mono',monospace;font-size:.82rem;cursor:pointer;transition:background .2s;white-space:nowrap;font-weight:700;}
+  .btn-add:hover{background:rgba(124,106,247,.35);}
+  .tx-form{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.1rem;margin-bottom:.9rem;}
+  .tx-row{display:grid;grid-template-columns:1fr auto 1fr;gap:.5rem;align-items:end;margin-bottom:.6rem;}
+  .tx-arrow{color:var(--muted);font-size:1.1rem;text-align:center;padding-bottom:.5rem;}
+  .select-inp{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.65rem .9rem;border-radius:8px;font-family:'Space Mono',monospace;font-size:.82rem;}
+  .select-inp:focus{outline:none;border-color:var(--accent);}
+  select option{background:#1a1a26;}
+  .tx-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.9rem;max-height:180px;overflow-y:auto;}
+  .tx-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.55rem .9rem;font-size:.8rem;}
+  .tx-item-flow{display:flex;align-items:center;gap:.4rem;}
+  .tx-from{color:var(--danger);}.tx-to{color:var(--accent3);}.tx-amt{color:var(--accent2);font-weight:700;}
+  .tx-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;transition:color .2s;}
+  .tx-del:hover{color:var(--danger);}
+  .btn-run{width:100%;background:linear-gradient(135deg,var(--accent),#9d8ff9);color:#fff;border:none;padding:.9rem;border-radius:10px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;letter-spacing:1px;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(124,106,247,.3);}
+  .btn-run:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(124,106,247,.5);}
+  .btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-demo{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);padding:.6rem;border-radius:8px;font-family:inherit;cursor:pointer;font-size:.75rem;letter-spacing:1px;margin-top:.6rem;}
+  .btn-demo:hover{color:var(--text);border-color:var(--accent);}
+  /* results */
+  .results-panel{position:relative;z-index:1;padding:1.5rem;}
+  .info-box{background:rgba(124,106,247,.06);border:1px solid rgba(124,106,247,.2);border-radius:10px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;}
+  .info-box h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--accent);margin-bottom:.6rem;}
+  .info-box p{color:var(--muted);font-size:.8rem;line-height:1.75;}
+  .priority-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.4rem;}
+  @media(max-width:700px){.priority-grid{grid-template-columns:1fr;}}
+  .priority-list{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.1rem;}
+  .priority-list h4{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:.9rem;}
+  .priority-item{display:flex;align-items:center;gap:.75rem;padding:.65rem .8rem;border-radius:8px;margin-bottom:.5rem;font-size:.82rem;}
+  .priority-item.debtor-item{background:rgba(247,106,106,.07);border:1px solid rgba(247,106,106,.2);}
+  .priority-item.creditor-item{background:rgba(106,247,194,.07);border:1px solid rgba(106,247,194,.2);}
+  .p-rank{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;min-width:22px;}
+  .p-rank.d{color:var(--danger);}.p-rank.c{color:var(--accent3);}
+  .p-name{flex:1;font-weight:700;}
+  .p-amt{font-weight:700;}
+  .p-amt.d{color:var(--danger);}.p-amt.c{color:var(--accent3);}
+  .p-label{font-size:.68rem;color:var(--muted);letter-spacing:1px;}
+  .suggest-list{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1.2rem;}
+  .suggest-item{display:flex;align-items:center;justify-content:space-between;background:rgba(124,106,247,.06);border:1px solid rgba(124,106,247,.2);border-radius:10px;padding:.8rem 1.1rem;font-size:.83rem;animation:slideIn .3s ease both;}
+  @keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:none;}}
+  .s-flow{display:flex;align-items:center;gap:.55rem;}
+  .s-from{font-weight:700;color:var(--danger);}
+  .s-to{font-weight:700;color:var(--accent3);}
+  .s-arrow{color:var(--muted);}
+  .s-amt{color:var(--accent2);font-weight:700;}
+  .conclude-box{background:rgba(124,106,247,.06);border:1px solid rgba(124,106,247,.25);border-radius:10px;padding:1.2rem 1.4rem;margin-top:1.2rem;}
+  .conclude-box h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--accent);margin-bottom:.6rem;}
+  .conclude-box p{color:var(--muted);font-size:.8rem;line-height:1.75;}
+  .conclude-box ul{color:var(--muted);font-size:.8rem;line-height:1.9;padding-left:1.2rem;margin-top:.4rem;}
+  .diff-box{background:rgba(247,194,106,.06);border:1px solid rgba(247,194,106,.2);border-radius:10px;padding:1.1rem 1.4rem;margin-bottom:1.2rem;}
+  .diff-box h4{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--accent2);margin-bottom:.5rem;}
+  .diff-box p{color:var(--muted);font-size:.78rem;line-height:1.7;}
+  .section-lbl{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;margin-top:1.1rem;}
+  .empty-state{text-align:center;padding:3.5rem 2rem;color:var(--muted);}
+  .empty-icon{font-size:2.8rem;margin-bottom:.8rem;opacity:.4;}
+  .empty-state p{font-size:.82rem;}
+  .toast{position:fixed;bottom:2rem;right:2rem;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.9rem 1.4rem;font-size:.82rem;color:var(--text);transform:translateY(20px);opacity:0;transition:all .3s;}
+  .toast.show{transform:none;opacity:1;}
+  .toast.error{border-color:var(--danger);color:var(--danger);}
+  .toast.success{border-color:var(--accent3);color:var(--accent3);}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Cash<span>Flow</span> ◈</div>
+  <div class="nav-modes">
+    <a href="/dashboard" class="nav-mode">⚡ Greedy</a>
+    <a href="/priority"  class="nav-mode active">⇅ Priority</a>
+    <a href="/paths"     class="nav-mode">⬡ Paths</a>
+    <a href="/zero-sum"  class="nav-mode">∑ Zero-Sum</a>
+  </div>
+  <a href="/" class="nav-home">← Home</a>
+</nav>
+
+<div class="page-header">
+  <div class="badge">🟦 Mode 2</div>
+  <h1>Debt Settlement Priority Mode</h1>
+  <p>Determine <strong>who should settle first</strong> by sorting participants by debt and credit magnitude. Focus is on order and priority, not full optimization.</p>
+</div>
+
+<div class="app-layout">
+  <!-- LEFT INPUT -->
+  <div style="display:flex;flex-direction:column;gap:1.2rem;">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="dot dot-blue"></div> Participants</div>
+        <span id="p-count" style="color:var(--muted);font-size:.75rem;">0 added</span>
+      </div>
+      <div class="panel-body">
+        <div class="chips" id="chips"></div>
+        <div class="add-row">
+          <input class="inp" id="p-input" placeholder="Enter name…" onkeydown="if(event.key==='Enter') addParticipant()"/>
+          <button class="btn-add" onclick="addParticipant()">+ Add</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="dot dot-yellow"></div> Transactions</div>
+        <span id="t-count" style="color:var(--muted);font-size:.75rem;">0 added</span>
+      </div>
+      <div class="panel-body">
+        <div class="tx-form">
+          <div class="tx-row">
+            <div class="input-group" style="margin-bottom:0"><label>From (Debtor)</label><select class="select-inp inp" id="tx-from"><option value="">Select…</option></select></div>
+            <div class="tx-arrow">→</div>
+            <div class="input-group" style="margin-bottom:0"><label>To (Creditor)</label><select class="select-inp inp" id="tx-to"><option value="">Select…</option></select></div>
+          </div>
+          <div class="input-group"><label>Amount (₹)</label><input class="inp" id="tx-amt" type="number" min="0.01" step="0.01" placeholder="e.g. 500" onkeydown="if(event.key==='Enter') addTransaction()"/></div>
+          <button class="btn-add" style="width:100%" onclick="addTransaction()">+ Add Transaction</button>
+        </div>
+        <div class="tx-list" id="tx-list"></div>
+      </div>
+    </div>
+    <button class="btn-run" id="run-btn" onclick="runPriority()" disabled>⇅ COMPUTE PRIORITY</button>
+    <button class="btn-demo" onclick="loadDemo()">Load Demo Data</button>
+  </div>
+
+  <!-- RIGHT RESULTS -->
+  <div class="panel" style="display:flex;flex-direction:column;overflow-y:auto;">
+    <div id="results-wrap" style="padding:1.4rem;">
+      <div class="empty-state"><div class="empty-icon">⇅</div><p>Add participants & transactions,<br>then click Compute Priority.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const participants=[], transactions=[];
+
+function addParticipant(){
+  const inp=document.getElementById('p-input');const name=inp.value.trim();
+  if(!name)return;if(participants.includes(name)){showToast('Already added!','error');return;}
+  participants.push(name);inp.value='';renderChips();updateSelects();updateRunBtn();
+}
+function removeParticipant(name){
+  participants.splice(participants.indexOf(name),1);
+  for(let i=transactions.length-1;i>=0;i--)if(transactions[i].debtor===name||transactions[i].creditor===name)transactions.splice(i,1);
+  renderChips();renderTxList();updateSelects();updateRunBtn();
+}
+function renderChips(){
+  document.getElementById('chips').innerHTML=participants.map(p=>`<span class="chip">${p}<button class="chip-remove" onclick="removeParticipant('${p}')">×</button></span>`).join('');
+  document.getElementById('p-count').textContent=participants.length+' added';
+}
+function updateSelects(){
+  const opts='<option value="">Select…</option>'+participants.map(p=>`<option>${p}</option>`).join('');
+  document.getElementById('tx-from').innerHTML=opts;document.getElementById('tx-to').innerHTML=opts;
+}
+function addTransaction(){
+  const from=document.getElementById('tx-from').value,to=document.getElementById('tx-to').value,amt=parseFloat(document.getElementById('tx-amt').value);
+  if(!from||!to){showToast('Select both parties','error');return;}if(from===to){showToast('Debtor ≠ Creditor','error');return;}if(!amt||amt<=0){showToast('Enter valid amount','error');return;}
+  transactions.push({debtor:from,creditor:to,amount:amt});document.getElementById('tx-amt').value='';renderTxList();updateRunBtn();
+}
+function removeTx(i){transactions.splice(i,1);renderTxList();updateRunBtn();}
+function renderTxList(){
+  const el=document.getElementById('tx-list');document.getElementById('t-count').textContent=transactions.length+' added';
+  if(!transactions.length){el.innerHTML='';return;}
+  el.innerHTML=transactions.map((t,i)=>`<div class="tx-item"><div class="tx-item-flow"><span class="tx-from">${t.debtor}</span><span style="color:var(--muted)">→</span><span class="tx-to">${t.creditor}</span><span style="color:var(--muted)">·</span><span class="tx-amt">₹${t.amount}</span></div><button class="tx-del" onclick="removeTx(${i})">✕</button></div>`).join('');
+}
+function updateRunBtn(){document.getElementById('run-btn').disabled=participants.length<2||transactions.length===0;}
+
+async function runPriority(){
+  try{
+    const res=await fetch('/api/priority',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({participants,transactions})});
+    const data=await res.json();
+    if(!res.ok){showToast(data.error,'error');return;}
+    renderPriority(data);showToast('Priority computed!','success');
+  }catch(e){showToast('Server error','error');}
+}
+
+function renderPriority(data){
+  const wrap=document.getElementById('results-wrap');
+  let html=`
+    <div class="info-box">
+      <h4>What is Priority Settlement?</h4>
+      <p>Priority mode sorts participants by the <strong>magnitude of their net balance</strong>. The person with the <strong>highest debt</strong> should pay first; the person with the <strong>highest credit</strong> should receive first. This ensures the most impactful settlements happen early, even if the total count isn't minimized like Greedy mode.</p>
+    </div>
+    <div class="diff-box">
+      <h4>⚡ Key Difference from Greedy Mode</h4>
+      <p>Greedy mode focuses on <strong>minimizing transaction count</strong>. Priority mode focuses on <strong>order of settlement</strong> — who is most urgently owed money, and who owes the most. Useful when you want to plan settlement schedules rather than just reduce transactions.</p>
+    </div>
+    <div class="priority-grid">
+      <div class="priority-list">
+        <h4 style="color:var(--danger)">↓ Debtor Priority (Pay First)</h4>`;
+  data.debtors.forEach((d,i)=>{
+    html+=`<div class="priority-item debtor-item">
+      <span class="p-rank d">#${i+1}</span>
+      <span class="p-name">${d.name}</span>
+      <div style="text-align:right"><div class="p-amt d">₹${d.amount.toFixed(2)}</div><div class="p-label">owes</div></div>
+    </div>`;
+  });
+  if(!data.debtors.length) html+=`<p style="color:var(--muted);font-size:.78rem;text-align:center;padding:1rem">No debtors</p>`;
+  html+=`</div><div class="priority-list"><h4 style="color:var(--accent3)">↑ Creditor Priority (Receive First)</h4>`;
+  data.creditors.forEach((c,i)=>{
+    html+=`<div class="priority-item creditor-item">
+      <span class="p-rank c">#${i+1}</span>
+      <span class="p-name">${c.name}</span>
+      <div style="text-align:right"><div class="p-amt c">₹${c.amount.toFixed(2)}</div><div class="p-label">receives</div></div>
+    </div>`;
+  });
+  if(!data.creditors.length) html+=`<p style="color:var(--muted);font-size:.78rem;text-align:center;padding:1rem">No creditors</p>`;
+  html+=`</div></div>
+    <div class="section-lbl">// Suggested Settlements (Priority Order)</div>
+    <div class="suggest-list">`;
+  if(!data.suggestions.length){
+    html+=`<div style="text-align:center;color:var(--accent3);padding:1.5rem">✓ All balances are zero — no settlements needed!</div>`;
+  } else {
+    data.suggestions.forEach((s,i)=>{
+      html+=`<div class="suggest-item" style="animation-delay:${i*60}ms">
+        <div style="color:var(--muted);font-size:.68rem;letter-spacing:1px;min-width:60px">#${i+1} PRIORITY</div>
+        <div class="s-flow">
+          <span class="s-from">${s.from}</span>
+          <span class="s-arrow">should pay</span>
+          <span class="s-to">${s.to}</span>
+        </div>
+        <span class="s-amt">₹${s.amount}</span>
+      </div>`;
+    });
+  }
+  html+=`</div>
+    <div class="conclude-box">
+      <h4>✓ Conclusion</h4>
+      <ul>
+        <li>Debtors are ranked by <strong>highest debt first</strong> — they should settle first</li>
+        <li>Creditors are ranked by <strong>highest credit first</strong> — they should receive first</li>
+        <li>Suggested settlements follow priority order, ensuring the <strong>most critical debts</strong> are addressed early</li>
+        <li>This is useful for <strong>scheduling payments</strong> rather than minimizing their count</li>
+      </ul>
+    </div>`;
+  wrap.innerHTML=html;
+}
+
+function loadDemo(){
+  ['Alice','Bob','Carol','Dave','Eve'].forEach(n=>{if(!participants.includes(n))participants.push(n);});
+  transactions.length=0;
+  [['Alice','Bob',300],['Bob','Carol',200],['Carol','Dave',150],['Dave','Alice',100],['Eve','Alice',250],['Bob','Eve',80]].forEach(([d,c,a])=>transactions.push({debtor:d,creditor:c,amount:a}));
+  renderChips();updateSelects();renderTxList();updateRunBtn();showToast('Demo data loaded!','success');
+}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Path Explorer — CashFlow Minimizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--border:#2a2a40;--accent:#7c6af7;--accent2:#f7c26a;--accent3:#6af7c2;--text:#e8e8f5;--muted:#7878a0;--danger:#f76a6a;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;display:flex;flex-direction:column;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,106,247,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,106,247,.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+  nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.9rem 2rem;background:rgba(10,10,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;background:linear-gradient(135deg,var(--accent),var(--accent3));background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .logo span{-webkit-text-fill-color:var(--accent2);}
+  .nav-modes{display:flex;gap:.3rem;}
+  .nav-mode{padding:.45rem 1rem;border-radius:6px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;text-decoration:none;color:var(--muted);transition:background .2s,color .2s;border:1px solid transparent;}
+  .nav-mode:hover{color:var(--text);background:rgba(255,255,255,.05);}
+  .nav-mode.active{color:var(--danger);background:rgba(247,106,106,.1);border-color:rgba(247,106,106,.25);}
+  .nav-home{color:var(--muted);text-decoration:none;font-size:.78rem;}
+  .nav-home:hover{color:var(--text);}
+  .page-header{position:relative;z-index:1;padding:2rem 2rem 1rem;border-bottom:1px solid var(--border);}
+  .page-header .badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(247,106,106,.1);border:1px solid rgba(247,106,106,.25);color:var(--danger);padding:.3rem .8rem;border-radius:999px;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:.6rem;}
+  .page-header h1{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-1px;}
+  .page-header p{color:var(--muted);font-size:.83rem;margin-top:.3rem;}
+  .app-layout{position:relative;z-index:1;display:grid;grid-template-columns:360px 1fr;gap:1.5rem;padding:1.5rem 2rem;flex:1;max-width:1400px;margin:0 auto;width:100%;}
+  @media(max-width:900px){.app-layout{grid-template-columns:1fr;}}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .panel-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);}
+  .panel-title{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.5rem;}
+  .dot{width:8px;height:8px;border-radius:50%;}.dot-red{background:var(--danger);}.dot-yellow{background:var(--accent2);}
+  .panel-body{padding:1.4rem;}
+  .input-group{margin-bottom:1.1rem;}
+  .input-group label{display:block;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem;}
+  .inp{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.65rem .9rem;border-radius:8px;font-family:'Space Mono',monospace;font-size:.84rem;transition:border-color .2s;}
+  .inp:focus{outline:none;border-color:var(--danger);}
+  .inp::placeholder{color:var(--muted);}
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem;min-height:32px;}
+  .chip{display:inline-flex;align-items:center;gap:.35rem;background:rgba(247,106,106,.12);border:1px solid rgba(247,106,106,.3);color:var(--danger);padding:.3rem .65rem;border-radius:999px;font-size:.75rem;}
+  .chip-remove{cursor:pointer;opacity:.6;transition:opacity .2s;background:none;border:none;color:inherit;padding:0;font-size:.85rem;}
+  .chip-remove:hover{opacity:1;}
+  .add-row{display:flex;gap:.5rem;}
+  .btn-add{background:rgba(247,106,106,.15);border:1px solid rgba(247,106,106,.35);color:var(--danger);padding:.65rem .9rem;border-radius:8px;font-family:'Space Mono',monospace;font-size:.82rem;cursor:pointer;transition:background .2s;white-space:nowrap;font-weight:700;}
+  .btn-add:hover{background:rgba(247,106,106,.3);}
+  .tx-form{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.1rem;margin-bottom:.9rem;}
+  .tx-row{display:grid;grid-template-columns:1fr auto 1fr;gap:.5rem;align-items:end;margin-bottom:.6rem;}
+  .tx-arrow{color:var(--muted);font-size:1.1rem;text-align:center;padding-bottom:.5rem;}
+  .select-inp{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.65rem .9rem;border-radius:8px;font-family:'Space Mono',monospace;font-size:.82rem;}
+  .select-inp:focus{outline:none;border-color:var(--danger);}
+  select option{background:#1a1a26;}
+  .tx-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.9rem;max-height:180px;overflow-y:auto;}
+  .tx-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.55rem .9rem;font-size:.8rem;}
+  .tx-item-flow{display:flex;align-items:center;gap:.4rem;}
+  .tx-from{color:var(--danger);}.tx-to{color:var(--accent3);}.tx-amt{color:var(--accent2);font-weight:700;}
+  .tx-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;transition:color .2s;}
+  .tx-del:hover{color:var(--danger);}
+  .btn-run{width:100%;background:linear-gradient(135deg,var(--danger),#f76ab4);color:#fff;border:none;padding:.9rem;border-radius:10px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;cursor:pointer;letter-spacing:1px;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(247,106,106,.3);}
+  .btn-run:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(247,106,106,.5);}
+  .btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-demo{width:100%;background:transparent;color:var(--muted);border:1px solid var(--border);padding:.6rem;border-radius:8px;font-family:inherit;cursor:pointer;font-size:.75rem;letter-spacing:1px;margin-top:.6rem;}
+  .btn-demo:hover{color:var(--text);border-color:var(--danger);}
+  .info-box{background:rgba(247,106,106,.06);border:1px solid rgba(247,106,106,.2);border-radius:10px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;}
+  .info-box h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--danger);margin-bottom:.6rem;}
+  .info-box p{color:var(--muted);font-size:.8rem;line-height:1.75;}
+  .optimal-box{background:rgba(106,247,194,.06);border:2px solid rgba(106,247,194,.3);border-radius:12px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;}
+/* Canvas styling */
+#all-paths-canvas, #optimal-path-canvas {display:block;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+  /* Canvas styling */
+  #all-paths-canvas, #optimal-path-canvas {display:block;margin:auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;}
+  .optimal-box h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--accent3);margin-bottom:.6rem;}
+  .path-str{font-size:1.1rem;font-weight:700;color:var(--accent3);letter-spacing:1px;}
+  .path-meta{color:var(--muted);font-size:.75rem;margin-top:.4rem;}
+  .paths-list{display:flex;flex-direction:column;gap:.6rem;max-height:400px;overflow-y:auto;}
+  .path-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem;font-size:.82rem;animation:slideIn .3s ease both;}
+  .path-item.optimal{border-color:var(--accent3);background:rgba(106,247,194,.04);}
+  .path-item.suboptimal{opacity:.8;}
+  @keyframes slideIn{from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:none;}}
+  .path-nodes{display:flex;align-items:center;flex-wrap:wrap;gap:.3rem;}
+  .path-node{background:rgba(124,106,247,.15);border:1px solid rgba(124,106,247,.3);color:var(--accent);padding:.2rem .6rem;border-radius:5px;font-size:.78rem;font-weight:700;}
+  .path-node.optimal-node{background:rgba(106,247,194,.15);border-color:rgba(106,247,194,.3);color:var(--accent3);}
+  .path-arrow{color:var(--muted);font-size:.9rem;}
+  .path-hops{font-size:.7rem;letter-spacing:1px;color:var(--muted);margin-top:.3rem;}
+  .why-box{background:rgba(247,194,106,.06);border:1px solid rgba(247,194,106,.2);border-radius:10px;padding:1.1rem 1.4rem;margin-top:1.1rem;}
+  .why-box h4{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--accent2);margin-bottom:.5rem;}
+  .why-box p{color:var(--muted);font-size:.78rem;line-height:1.7;}
+  .conclude-box{background:rgba(247,106,106,.06);border:1px solid rgba(247,106,106,.25);border-radius:10px;padding:1.2rem 1.4rem;margin-top:1.2rem;}
+  .conclude-box h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:var(--danger);margin-bottom:.6rem;}
+  .conclude-box ul{color:var(--muted);font-size:.8rem;line-height:1.9;padding-left:1.2rem;}
+  .section-lbl{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;margin-top:1.1rem;}
+  .empty-state{text-align:center;padding:3.5rem 2rem;color:var(--muted);}
+  .empty-icon{font-size:2.8rem;margin-bottom:.8rem;opacity:.4;}
+  .empty-state p{font-size:.82rem;}
+  .toast{position:fixed;bottom:2rem;right:2rem;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.9rem 1.4rem;font-size:.82rem;color:var(--text);transform:translateY(20px);opacity:0;transition:all .3s;}
+  .toast.show{transform:none;opacity:1;}
+  .toast.error{border-color:var(--danger);color:var(--danger);}
+  .toast.success{border-color:var(--accent3);color:var(--accent3);}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Cash<span>Flow</span> ◈</div>
+  <div class="nav-modes">
+    <a href="/dashboard" class="nav-mode">⚡ Greedy</a>
+    <a href="/priority"  class="nav-mode">⇅ Priority</a>
+    <a href="/paths"     class="nav-mode active">⬡ Paths</a>
+    <a href="/zero-sum"  class="nav-mode">∑ Zero-Sum</a>
+  </div>
+  <a href="/" class="nav-home">← Home</a>
+</nav>
+
+<div class="page-header">
+  <div class="badge">🟥 Mode 3</div>
+  <h1>Settlement Path Explorer</h1>
+  <p>Explore all possible settlement paths through the transaction graph using <strong>DFS / Backtracking</strong>. Find the most direct flow from each debtor to each creditor.</p>
+</div>
+
+<div class="app-layout">
+  <div style="display:flex;flex-direction:column;gap:1.2rem;">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="dot dot-red"></div> Participants</div>
+        <span id="p-count" style="color:var(--muted);font-size:.75rem;">0 added</span>
+      </div>
+      <div class="panel-body">
+        <div class="chips" id="chips"></div>
+        <div class="add-row">
+          <input class="inp" id="p-input" placeholder="Enter name…" onkeydown="if(event.key==='Enter') addParticipant()"/>
+          <button class="btn-add" onclick="addParticipant()">+ Add</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><div class="dot dot-yellow"></div> Transactions</div>
+        <span id="t-count" style="color:var(--muted);font-size:.75rem;">0 added</span>
+      </div>
+      <div class="panel-body">
+        <div class="tx-form">
+          <div class="tx-row">
+            <div class="input-group" style="margin-bottom:0"><label>From (Debtor)</label><select class="select-inp inp" id="tx-from"><option value="">Select…</option></select></div>
+            <div class="tx-arrow">→</div>
+            <div class="input-group" style="margin-bottom:0"><label>To (Creditor)</label><select class="select-inp inp" id="tx-to"><option value="">Select…</option></select></div>
+          </div>
+          <div class="input-group"><label>Amount (₹)</label><input class="inp" id="tx-amt" type="number" min="0.01" step="0.01" placeholder="e.g. 500" onkeydown="if(event.key==='Enter') addTransaction()"/></div>
+          <button class="btn-add" style="width:100%" onclick="addTransaction()">+ Add Transaction</button>
+        </div>
+        <div class="tx-list" id="tx-list"></div>
+      </div>
+    </div>
+    <button class="btn-run" id="run-btn" onclick="runPaths()" disabled>⬡ EXPLORE PATHS</button>
+    <button class="btn-demo" onclick="loadDemo()">Load Demo Data</button>
+  </div>
+
+  <div class="panel" style="display:flex;flex-direction:column;overflow-y:auto;">
+    <div id="results-wrap" style="padding:1.4rem;">
+      <div class="empty-state"><div class="empty-icon">⬡</div><p>Add participants & transactions,<br>then click Explore Paths.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const participants=[], transactions=[];
+function addParticipant(){const inp=document.getElementById('p-input');const name=inp.value.trim();if(!name)return;if(participants.includes(name)){showToast('Already added!','error');return;}participants.push(name);inp.value='';renderChips();updateSelects();updateRunBtn();}
+function removeParticipant(name){participants.splice(participants.indexOf(name),1);for(let i=transactions.length-1;i>=0;i--)if(transactions[i].debtor===name||transactions[i].creditor===name)transactions.splice(i,1);renderChips();renderTxList();updateSelects();updateRunBtn();}
+function renderChips(){document.getElementById('chips').innerHTML=participants.map(p=>`<span class="chip">${p}<button class="chip-remove" onclick="removeParticipant('${p}')">×</button></span>`).join('');document.getElementById('p-count').textContent=participants.length+' added';}
+function updateSelects(){const opts='<option value="">Select…</option>'+participants.map(p=>`<option>${p}</option>`).join('');document.getElementById('tx-from').innerHTML=opts;document.getElementById('tx-to').innerHTML=opts;}
+function addTransaction(){const from=document.getElementById('tx-from').value,to=document.getElementById('tx-to').value,amt=parseFloat(document.getElementById('tx-amt').value);if(!from||!to){showToast('Select both parties','error');return;}if(from===to){showToast('Debtor ≠ Creditor','error');return;}if(!amt||amt<=0){showToast('Enter valid amount','error');return;}transactions.push({debtor:from,creditor:to,amount:amt});document.getElementById('tx-amt').value='';renderTxList();updateRunBtn();}
+function removeTx(i){transactions.splice(i,1);renderTxList();updateRunBtn();}
+function renderTxList(){const el=document.getElementById('tx-list');document.getElementById('t-count').textContent=transactions.length+' added';if(!transactions.length){el.innerHTML='';return;}el.innerHTML=transactions.map((t,i)=>`<div class="tx-item"><div class="tx-item-flow"><span class="tx-from">${t.debtor}</span><span style="color:var(--muted)">→</span><span class="tx-to">${t.creditor}</span><span style="color:var(--muted)">·</span><span class="tx-amt">₹${t.amount}</span></div><button class="tx-del" onclick="removeTx(${i})">✕</button></div>`).join('');}
+function updateRunBtn(){document.getElementById('run-btn').disabled=participants.length<2||transactions.length===0;}
+
+async function runPaths(){
+  try{const res=await fetch('/api/paths',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({participants,transactions})});
+    const data=await res.json();if(!res.ok){showToast(data.error,'error');return;}
+    renderPaths(data);showToast('Paths explored!','success');
+  }catch(e){showToast('Server error','error');}
+}
+
+function renderPaths(data){
+  const wrap=document.getElementById('results-wrap');
+  let html=`<div class="info-box"><h4>How Path Exploration Works</h4>
+    <p>The transaction graph is traversed using <strong>DFS (Depth-First Search) with backtracking</strong>. Starting from each debtor node, we explore all reachable paths to each creditor node. Each unique route represents a possible chain of payments that could ultimately settle the debt.</p></div>`;
+
+  if(data.paths.length===0){
+    html+=`<div style="text-align:center;color:var(--muted);padding:2rem">No paths found. This may mean debtors and creditors are not connected through the transaction graph.</div>`;
+  } else {
+    if(data.optimal){
+      html+=`<div class="optimal-box"><h4>★ Optimal Path</h4>
+        <div class="path-str">${data.optimal.path_str}</div>
+        <div class="path-meta">${data.optimal.hops} hop(s) — fewest steps to settle</div>
+      </div>`;
+    }
+    html+=`<canvas id="all-paths-canvas" width="800" height="400" style="width:100%;max-width:800px;margin:auto;display:block;margin-top:1rem"></canvas>`;
+html+=`<div class="section-lbl">// All Possible Paths (${data.paths.length} found)</div><div class="paths-list">`;
+    data.paths.forEach((p,i)=>{
+      const isOpt = data.optimal && p.path_str === data.optimal.path_str;
+      const nodeClass = isOpt ? 'optimal-node' : '';
+      const nodes = p.path.map((n,j)=>{
+        let out = `<span class="path-node ${nodeClass}">${n}</span>`;
+        if(j<p.path.length-1) out += `<span class="path-arrow">→</span>`;
+        return out;
+      }).join('');
+      html+=`<div class="path-item ${isOpt?'optimal':'suboptimal'}" style="animation-delay:${i*40}ms">
+        ${isOpt?'<div style="font-size:.65rem;color:var(--accent3);letter-spacing:1px;margin-bottom:.4rem">★ OPTIMAL</div>':''}
+        <div class="path-nodes">${nodes}</div>
+        <div class="path-hops">${p.hops} hop(s)</div>
+      </div>`;
+    });
+    html+=`</div>`;
+
+
+    html+=`<div class="why-box"><h4>Why is the Optimal Path Better?</h4>
+      <p>A path with <strong>fewer hops</strong> means money travels through fewer intermediate people. Direct paths (1 hop: A → B) are the most efficient as they involve fewer parties and reduce the risk of chain failures. Longer paths (A → B → C → D) are less efficient — each intermediate node must coordinate their payment timing.</p></div>`;
+  }
+
+  html+=`<div class="conclude-box"><h4>✓ Conclusion</h4><ul>
+    <li>DFS explores <strong>all reachable paths</strong> from each debtor to each creditor</li>
+    <li>Backtracking ensures no node is revisited in a single path</li>
+    <li>The path with the <strong>fewest hops is optimal</strong> — fewer intermediaries, less coordination</li>
+    <li>This mode is useful for understanding <strong>cash flow topology</strong> in a group</li>
+  </ul></div>`;
+  wrap.innerHTML=html;
+drawAllPathsGraph(data);
+}
+
+function drawAllPathsGraph(data){
+  const canvas=document.getElementById('all-paths-canvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width, h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  const participants=Object.keys(data.balance);
+  const radius=Math.min(w,h)/2-60;
+  const cx=w/2, cy=h/2;
+  const points={};
+  
+  participants.forEach((p,i)=>{
+    const angle=2*Math.PI*i/participants.length;
+    const x=cx+radius*Math.cos(angle);
+    const y=cy+radius*Math.sin(angle);
+    points[p]={x,y};
+  });
+
+  // Draw paths (edges) first
+  const colors=['#ff6b6b','#6bffb1','#6b9bff','#ff6bf5','#ffb46b'];
+  data.paths.forEach((p,i)=>{
+    ctx.strokeStyle=colors[i%colors.length];
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    p.path.forEach((node,j)=>{
+      const pt=points[node];
+      if(j===0) ctx.moveTo(pt.x,pt.y); else ctx.lineTo(pt.x,pt.y);
+    });
+    ctx.stroke();
+  });
+
+  // Highlight optimal path in green on top of other paths
+  if(data.optimal){
+    ctx.strokeStyle='#6af7c2'; // Green accent
+    ctx.lineWidth=4;
+    ctx.beginPath();
+    data.optimal.path.forEach((node,i)=>{
+      const pt=points[node];
+      if(i===0) ctx.moveTo(pt.x,pt.y); else ctx.lineTo(pt.x,pt.y);
+    });
+    ctx.stroke();
+  }
+
+  // Draw nodes (circles) and text last so they appear on top
+  participants.forEach((p)=>{
+    const {x,y} = points[p];
+    
+    // Node circle background
+    ctx.fillStyle='#12121a'; // matches var(--surface)
+    ctx.beginPath();ctx.arc(x,y,22,0,2*Math.PI);ctx.fill();
+    
+    // Node border
+    ctx.strokeStyle='#7c6af7'; // matches var(--accent)
+    ctx.lineWidth=2;
+    ctx.stroke();
+    
+    // Node text
+    ctx.fillStyle='#e8e8f5'; // matches var(--text)
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font='bold 12px "Space Mono", monospace';
+    // If the name is too long, we might truncate it, but 3-4 letters fit fine.
+    // Let's just draw it. The user will see 'A', 'B', 'Alice', etc.
+    ctx.fillText(p,x,y);
+  });
+}
+
+
+function loadDemo(){
+  ['Alice','Bob','Carol','Dave'].forEach(n=>{if(!participants.includes(n))participants.push(n);});
+  transactions.length=0;
+  [['Alice','Bob',200],['Bob','Carol',150],['Carol','Dave',100],['Alice','Carol',80]].forEach(([d,c,a])=>transactions.push({debtor:d,creditor:c,amount:a}));
+  renderChips();updateSelects();renderTxList();updateRunBtn();showToast('Demo data loaded!','success');
+}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>

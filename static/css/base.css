@@ -1,0 +1,19 @@
+/* shared base styles - imported by all pages */
+:root {
+  --bg: #0a0a0f; --surface: #12121a; --card: #1a1a26;
+  --border: #2a2a40; --accent: #7c6af7; --accent2: #f7c26a;
+  --accent3: #6af7c2; --text: #e8e8f5; --muted: #7878a0;
+  --danger: #f76a6a; --success: #6af7c2;
+  --blue: #6ab4f7; --pink: #f76ab4;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Space Mono', monospace; min-height: 100vh;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(124,106,247,.04) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(124,106,247,.04) 1px,transparent 1px);
+  background-size: 48px 48px; pointer-events: none; z-index: 0;
+}
